@@ -14,6 +14,8 @@ HandLandmarker = vision.HandLandmarker
 HandLandmarkerOptions = vision.HandLandmarkerOptions
 VisionRunningMode = vision.RunningMode
 
+peace = cv2.imread(r"C:\Users\dommi\PycharmProjects\Laptop Control\OpenCV\peace.jpg")
+
 options = HandLandmarkerOptions(
     base_options = BaseOptions(model_asset_path = model_path),
     running_mode = VisionRunningMode.VIDEO,
@@ -29,7 +31,6 @@ HAND_CONNECTIONS = [
     (9,13),(13,14),(14,15),(15,16),
     (13,17),(17,18),(18,19),(19,20),
     (0,17)
-
 ]
 
 while True:
@@ -53,12 +54,12 @@ while True:
         for hand_landmarks in result.hand_landmarks:
             h, w, _ = frame.shape
 
-            index_up = hand_landmarks[8].y < hand_landmarks[6].y
-            middle_down = hand_landmarks[12].y > hand_landmarks[10].y
-            ring_down = hand_landmarks[16].y > hand_landmarks[14].y
-            pinky_down = hand_landmarks[20].y > hand_landmarks[18].y
+            index_up = hand_landmarks[8].y < hand_landmarks[5].y
+            middle_up = hand_landmarks[12].y < hand_landmarks[9].y
+            ring_down = hand_landmarks[16].y > hand_landmarks[13].y
+            pinky_down = hand_landmarks[20].y > hand_landmarks[17].y
 
-            if index_up and middle_down and ring_down and pinky_down:
+            if index_up and ring_down and pinky_down:
                 mouse_x = int(hand_landmarks[8].x * screen_w)
                 mouse_y = int(hand_landmarks[8].y * screen_h)
                 pyautogui.moveTo(mouse_x, mouse_y)
@@ -76,10 +77,15 @@ while True:
 
                 cv2.line(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
 
+    cv2.waitKey(1)
+
     cv2.imshow("Hand Tracking", frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    key = cv2.waitKey(1) & 0xFF
+
+    if key==27:
         break
 
+print(index_up, middle_up, ring_down, pinky_down)
 cap.release()
 cv2.destroyAllWindows()
