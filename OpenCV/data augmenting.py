@@ -2,8 +2,8 @@ import cv2
 import random
 import os
 
-input_folder = "dataset/thumb"
-output_folder = "dataset_aug/thumb"
+input_folder = "dataset/index"
+output_folder = "dataset_aug/index"
 
 os.makedirs(output_folder, exist_ok=True)
 
