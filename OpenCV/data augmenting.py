@@ -2,8 +2,8 @@ import cv2
 import random
 import os
 
-input_folder = "dataset/index"
-output_folder = "dataset_aug/index"
+input_folder = "dataset/ring"
+output_folder = "dataset_aug/ring"
 
 os.makedirs(output_folder, exist_ok=True)
 
@@ -18,7 +18,6 @@ def augment_image(img):
 
     augmented.append(rotated)
 
-    # Brightness
     bright = cv2.convertScaleAbs(img, alpha=1, beta=50)
     dark = cv2.convertScaleAbs(img, alpha=1, beta=-50)
     augmented.extend([bright, dark])
