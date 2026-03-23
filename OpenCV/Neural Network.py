@@ -43,7 +43,7 @@ model = FingerCNN()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 criterion = nn.CrossEntropyLoss()
 
-for epoch in range(5):
+for epoch in range(10):
     for images, labels in train_loader:
         outputs = model(images)
         loss = criterion(outputs, labels)
