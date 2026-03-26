@@ -54,6 +54,8 @@ for epoch in range(10):
 
     print(f"Epoch {epoch} done")
 
+print(loss)
+
 torch.save(model.state_dict(), "finger_model.pth")
 model.load_state_dict(torch.load("finger_model.pth"))
 model.eval()
@@ -67,7 +69,6 @@ while True:
     if not ret:
         break
 
-    # OPTIONAL: crop center (helps a lot)
     h, w, _ = frame.shape
     hand = frame[h//4:3*h//4, w//4:3*w//4]
 
@@ -77,14 +78,12 @@ while True:
     tensor = torch.tensor(img).float() / 255.0
     tensor = tensor.permute(2, 0, 1).unsqueeze(0)
 
-    # prediction
     with torch.no_grad():
         output = model(tensor)
         pred = torch.argmax(output).item()
 
     label = labels[pred]
 
-    # show result
     cv2.putText(frame, label, (10, 40),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
 

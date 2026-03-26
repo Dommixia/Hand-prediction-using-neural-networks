@@ -8,7 +8,7 @@ for root, _, files in os.walk(base_path):
         path = os.path.join(root, file)
         try:
             img = Image.open(path)
-            img.verify()  # check if valid
+            img.verify()
         except:
             print("Deleting corrupted:", path)
             os.remove(path)
