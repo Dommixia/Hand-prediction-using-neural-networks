@@ -1,12 +1,9 @@
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 import torch
 from torch import nn
 import torch.nn.functional as F
 import cv2
-
-
-
 transform = transforms.Compose([
     transforms.Resize((64, 64)),
     transforms.ToTensor()
@@ -14,7 +11,17 @@ transform = transforms.Compose([
 
 dataset = datasets.ImageFolder("dataset_aug", transform=transform)
 
-train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
+train_size = int(0.8 * len(dataset))
+test_size = len(dataset) - train_size
+
+train_dataset, test_dataset = random_split(
+    dataset,
+    [train_size, test_size],
+    generator=torch.Generator().manual_seed(42)
+)
+
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 class FingerCNN(nn.Module):
     def __init__(self):
@@ -74,6 +81,38 @@ def print_mae_r2(model, data_loader):
     print(f"MAE: {mae:.4f}")
     print(f"R2: {r2:.4f}")
 
+def predict_on_test_dataset(model, data_loader, class_names, max_samples=10):
+    model.eval()
+    all_preds = []
+    all_targets = []
+
+    with torch.no_grad():
+        for images, labels in data_loader:
+            outputs = model(images)
+            preds = torch.argmax(outputs, dim=1)
+            all_preds.append(preds)
+            all_targets.append(labels)
+
+    y_pred = torch.cat(all_preds)
+    y_true = torch.cat(all_targets)
+
+    accuracy = (y_pred == y_true).float().mean().item()
+    mae = torch.mean(torch.abs(y_true.float() - y_pred.float())).item()
+    ss_res = torch.sum((y_true.float() - y_pred.float()) ** 2)
+    ss_tot = torch.sum((y_true.float() - torch.mean(y_true.float())) ** 2)
+    r2 = (1 - ss_res / ss_tot).item() if ss_tot > 0 else 0.0
+
+    print(f"Test Accuracy: {accuracy:.4f}")
+    print(f"Test MAE: {mae:.4f}")
+    print(f"Test R2: {r2:.4f}")
+    print("Sample predictions (actual -> predicted):")
+
+    sample_count = min(max_samples, y_true.size(0))
+    for i in range(sample_count):
+        true_name = class_names[y_true[i].item()]
+        pred_name = class_names[y_pred[i].item()]
+        print(f"{true_name} -> {pred_name}")
+
 for epoch in range(10):
     for images, labels in train_loader:
         outputs = model(images)
@@ -93,6 +132,7 @@ model.load_state_dict(torch.load("finger_model.pth"))
 model.eval()
 
 labels = ["index", "middle", "pinky", "ring", "thumb"]
+predict_on_test_dataset(model, test_loader, labels)
 
 cap = cv2.VideoCapture(0)
 
