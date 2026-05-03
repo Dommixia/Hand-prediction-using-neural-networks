@@ -58,7 +58,6 @@ python inference.py
 
 - Add more gesture classes
 - Improve accuracy with transfer learning (e.g. MobileNet)
-- Deploy as a web app using Streamlit or Gradio
 - Explore using MediaPipe for hand landmark detection
 
 ## Author
