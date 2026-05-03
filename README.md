@@ -24,7 +24,7 @@ The system captures hand gestures through a webcam in real time, processes the f
 Hand-prediction-using-neural-networks/
 │
 ├── OpenCV/              # Real-time inference scripts using webcam
-├── dataset_aug/         # Augmented training dataset
+├── dataset_aug/         # Augmented training dataset (dataset excluded due to privacy reasons)
 ├── finger_model.pth     # Trained CNN model weights
 └── .gitignore
 
